@@ -20,8 +20,8 @@ Latest explicit user instructions take precedence over this report. When a decis
 - **Task status:** 01-14 implemented and checked at the source/CPU/isolated-notebook-structure level. Task 15 is partial: synthetic CPU end-to-end checks pass; real-data GPU and Kaggle acceptance remain pending.
 - **Checks performed:** `python -m unittest discover -s tests -q`: 11 tests pass on CPU (all supplied method/pair profiles at 16/20/24/28/32, sample-weight gradients, crop save/replay, shared bank identity, all-method resume versus uninterrupted execution, and exports). `python tools/validate_tgsc_references.py --reference-root .. --output docs/TGSC_REFERENCE_CHECKS.json`: passes official SimKD/ReviewKD component comparisons and TGSC oracle crop parity on ResNet/VGG/WRN families.
 - **Environment:** Windows PowerShell; Python 3.13, torch 2.6.0+cpu, torchvision 0.21.0+cpu. CUDA unavailable; YACS missing. New JSON-based runner deliberately does not require YACS. No real CIFAR/checkpoint training or Kaggle execution claimed.
-- **Repository:** all changes are inside mdistiller; sibling references untouched. No commit/push/remote modification performed.
-- **Working tree:** implementation, docs, profiles and notebooks are edited/untracked. Recheck live Git status/diffs.
+- **Repository:** private https://github.com/ahmad903501/mdistiller-tgsc created and implementation pushed to main. Origin points there; Megvii preserved as upstream. Sibling references untouched. Core implementation commit c293f52 and notebook repository configuration commit 8bc0ec4 are uploaded.
+- **Working tree:** implementation and delivery docs are committed; publication handoff update is being recorded. Recheck live Git status/diffs.
 - **Known numerical difference:** TGSC's existing internal ShuffleV1 pooling adaptation changes 32x32 predictions (random-weight reference max absolute difference .01352 in saved check); other audited pooling changes match within FP32 tolerance.
 - **Known tooling issue:** Python 3.13 tempfile(mode 0700) created inaccessible test folders in this sandbox. Tests now use a validated workspace scratch directory with compatible inherited permissions; initial test failures were filesystem errors, not algorithm failures.
 
@@ -44,7 +44,7 @@ Latest explicit user instructions take precedence over this report. When a decis
 | Delivery | Preparation notebook plus one notebook each for DKD/SimKD/ReviewKD; all call a shared Python runner. |
 | GPU scope | One selected GPU per process initially; independent jobs on separate GPUs. DDP is deferred. |
 | Recovery/export | Epoch-boundary resume and persistent Kaggle artifacts. SimKD export includes projector and frozen teacher head. |
-| Publishing | User explicitly authorized creating a new GitHub repo and pushing in the latest turn. New private repository created at https://github.com/ahmad903501/mdistiller-tgsc; initial push in progress. Kaggle dataset uploads remain user-managed. |
+| Publishing | User explicitly authorized creating a new GitHub repo and pushing in the latest turn. Private https://github.com/ahmad903501/mdistiller-tgsc created and pushed on main. Kaggle dataset uploads remain user-managed. Kaggle dataset uploads remain user-managed. |
 
 ## Verified facts worth carrying forward
 
@@ -165,3 +165,12 @@ Record commit hashes only after commits actually exist. Record GPU/Kaggle verifi
 - Local implementation commit: `c293f52` (Integrate TGSC with DKD, SimKD, and ReviewKD). Initial push is in progress; do not treat repository creation as proof of upload.
 - Notebook clone URLs now target the new repository on main; private cloning uses Kaggle Secrets. Added the T4 workflow to the running guide.
 - Cleaned reference-inherited trailing whitespace in three Python files. No numerical behavior changes; source-based cache keys will reflect the final committed sources.
+
+### 2026-10-21: initial push succeeded
+
+- Created private https://github.com/ahmad903501/mdistiller-tgsc under the user-selected account.
+- Preserved original Megvii remote as `upstream`, configured the new repository as `origin`, renamed the local branch to `main`, and pushed with tracking enabled. Git confirmed new remote branch main and exit status 0.
+- Uploaded commits: c293f52 (TGSC implementation) and 8bc0ec4 (actual private-repo URL and whitespace cleanup). This handoff update is a subsequent documentation commit.
+- User-facing Kaggle recommendation: prepare once per teacher on GPU 0, preserve/upload the bank as a Dataset, validate one epoch, then use independent GPU 0/1 jobs for experiment throughput if desired. One run across two GPUs remains unsupported/unbenchmarked.
+- Private notebooks use read-only GitHub access via Kaggle Secret GITHUB_TOKEN. Use the same code revision and torch/torchvision versions for cache preparation/training. Attach original CIFAR, teacher weights and cache to method notebooks.
+- GPU/Kaggle acceptance is still pending; pushing code does not establish GPU performance or accuracy.
