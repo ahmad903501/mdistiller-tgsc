@@ -76,7 +76,7 @@ Open `notebooks/tgsc_prepare_cifar100.ipynb`, edit its settings cell, enable a G
 
 Set `CACHE_ROOT` to the parent of the bank-hash folders, not the hash folder itself. Attached paths under `/kaggle/input/` are treated as read-only; new preparation outputs/checkpoints go under `/kaggle/working/`. Configure `--cache-write-root` to place missing entries in a writable overlay. Each notebook invokes the same Python runner in a subprocess using its kernel Python, streams output, and saves a log. No torch import in notebook setup is required for GPU selection.
 
-Set your own repository URL/revision; the current upstream URL does not contain these changes until you push them to your repository. Cloning/installing/downloading needs Internet; offline sessions need those inputs supplied beforehand. Saving files locally in one session does not automatically persist/share them across sessions. Preserve notebook output before continuing elsewhere. No automatic upload or publication is performed.
+The notebooks now point to the private repository `https://github.com/ahmad903501/mdistiller-tgsc.git` on `main`. Set a fixed commit revision to keep preparation and training reproducible. Cloning/installing/downloading needs Internet; offline sessions need those inputs supplied beforehand. Saving files locally in one session does not automatically persist/share them across sessions. Preserve notebook output before continuing elsewhere. No automatic upload or publication is performed.
 
 ### Recommended T4 x2 workflow
 

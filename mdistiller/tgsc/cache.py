@@ -188,4 +188,3 @@ def prepare_bank(exp, teacher, dataset, bank):
             bank.save(size, ds)
             print(f"Saved {len(ds)} crops: {bank.path(size, write=True)}", flush=True)
             del ds
-

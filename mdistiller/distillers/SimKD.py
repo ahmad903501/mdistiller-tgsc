@@ -8,16 +8,16 @@ from ..tgsc.gates import weighted_mean
 
 class SimKDProjector(nn.Module):
     """CVPR-2022: Knowledge Distillation with the Reused Teacher Classifier"""
-    def __init__(self, *, s_n, t_n, factor=2): 
+    def __init__(self, *, s_n, t_n, factor=2):
         super(SimKDProjector, self).__init__()
-       
-        self.avg_pool = nn.AdaptiveAvgPool2d((1,1))       
+
+        self.avg_pool = nn.AdaptiveAvgPool2d((1,1))
 
         def conv1x1(in_channels, out_channels, stride=1):
             return nn.Conv2d(in_channels, out_channels, kernel_size=1, padding=0, stride=stride, bias=False)
         def conv3x3(in_channels, out_channels, stride=1, groups=1):
             return nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, stride=stride, bias=False, groups=groups)
-        
+
         # A bottleneck design to reduce extra parameters
         setattr(self, 'transfer', nn.Sequential(
             conv1x1(s_n, t_n//factor),
@@ -32,9 +32,9 @@ class SimKDProjector(nn.Module):
             nn.BatchNorm2d(t_n),
             nn.ReLU(inplace=True),
             ))
-        
+
     def forward(self, feat_s, feat_t, cls_t):
-        
+
         # Spatial Dimension Alignment
         s_H, t_H = feat_s.shape[2], feat_t.shape[2]
         if s_H > t_H:
@@ -43,9 +43,9 @@ class SimKDProjector(nn.Module):
         else:
             source = feat_s
             target = F.adaptive_avg_pool2d(feat_t, (s_H, s_H))
-        
+
         trans_feat_t=target
-        
+
         # Channel Alignment
         trans_feat_s = getattr(self, 'transfer')(source)
 
@@ -53,7 +53,7 @@ class SimKDProjector(nn.Module):
         temp_feat = self.avg_pool(trans_feat_s)
         temp_feat = temp_feat.view(temp_feat.size(0), -1)
         pred_feat_s = cls_t(temp_feat)
-        
+
         return trans_feat_s, trans_feat_t, pred_feat_s
 
 def final_feature(features):

@@ -631,5 +631,3 @@ class CropTensorDataset(torch.utils.data.Dataset):
             quality_flags=payload["quality_flags"],
             components=payload["components"], boxes=payload["boxes"],
         )
-
-

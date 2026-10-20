@@ -44,7 +44,7 @@ Latest explicit user instructions take precedence over this report. When a decis
 | Delivery | Preparation notebook plus one notebook each for DKD/SimKD/ReviewKD; all call a shared Python runner. |
 | GPU scope | One selected GPU per process initially; independent jobs on separate GPUs. DDP is deferred. |
 | Recovery/export | Epoch-boundary resume and persistent Kaggle artifacts. SimKD export includes projector and frozen teacher head. |
-| Publishing | User explicitly authorized creating a new GitHub repo and pushing in the latest turn. Planned private mdistiller-tgsc repository; owner account selection pending among saved accounts. Kaggle dataset uploads remain user-managed. |
+| Publishing | User explicitly authorized creating a new GitHub repo and pushing in the latest turn. New private repository created at https://github.com/ahmad903501/mdistiller-tgsc; initial push in progress. Kaggle dataset uploads remain user-managed. |
 
 ## Verified facts worth carrying forward
 
@@ -158,3 +158,10 @@ Record commit hashes only after commits actually exist. Record GPU/Kaggle verifi
 - Expanded running guide with one-T4-per-job recommendation, two independent GPU 0/1 subprocess launches within one session, cache-output-to-Dataset steps, and one-epoch smoke/resume workflow.
 - `python tools/validate_tgsc_delivery.py`: all 11 tests/isolated checks and four notebook parses pass after these updates. Embedded askpass Python also parses; credential-pattern scan found no embedded secrets.
 - CUDA/Kaggle throughput is still unmeasured. DDP is not implemented; selecting T4 x2 alone does not make a single method use both GPUs.
+
+### 2026-10-21: GitHub repository created
+
+- User selected `ahmad903501` as owner. Created private `ahmad903501/mdistiller-tgsc` using that account's saved Git credentials, without printing/storing tokens.
+- Local implementation commit: `c293f52` (Integrate TGSC with DKD, SimKD, and ReviewKD). Initial push is in progress; do not treat repository creation as proof of upload.
+- Notebook clone URLs now target the new repository on main; private cloning uses Kaggle Secrets. Added the T4 workflow to the running guide.
+- Cleaned reference-inherited trailing whitespace in three Python files. No numerical behavior changes; source-based cache keys will reflect the final committed sources.
