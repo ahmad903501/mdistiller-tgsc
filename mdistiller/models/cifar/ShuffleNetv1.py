@@ -3,6 +3,16 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+class AdaptiveAvgPoolStride2(nn.Module):
+    """Resolution-agnostic replacement for AvgPool2d(k=3, s=2, p=1)."""
+
+    def forward(self, x):
+        h, w = x.shape[-2:]
+        out_h = max(1, (h + 1) // 2)
+        out_w = max(1, (w + 1) // 2)
+        return F.adaptive_avg_pool2d(x, (out_h, out_w))
+
+
 class ShuffleBlock(nn.Module):
     def __init__(self, groups):
         super(ShuffleBlock, self).__init__()
@@ -45,7 +55,7 @@ class Bottleneck(nn.Module):
 
         self.shortcut = nn.Sequential()
         if stride == 2:
-            self.shortcut = nn.Sequential(nn.AvgPool2d(3, stride=2, padding=1))
+            self.shortcut = nn.Sequential(AdaptiveAvgPoolStride2())
 
     def forward(self, x):
         out = F.relu(self.bn1(self.conv1(x)))
@@ -121,7 +131,7 @@ class ShuffleNet(nn.Module):
         f2 = out
         out, f3_pre = self.layer3(out)
         f3 = out
-        out = F.avg_pool2d(out, 4)
+        out = F.adaptive_avg_pool2d(out, (1, 1))
         out = out.reshape(out.size(0), -1)
         f4 = out
         out = self.linear(out)

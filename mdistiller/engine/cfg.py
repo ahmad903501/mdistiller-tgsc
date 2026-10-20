@@ -166,6 +166,12 @@ CFG.DKD.BETA = 8.0
 CFG.DKD.T = 4.0
 CFG.DKD.WARMUP = 20
 
+# Official feature-only SimKD; TGSC runner also supplies these through its JSON profiles.
+CFG.SIMKD = CN()
+CFG.SIMKD.FACTOR = 2
+CFG.SIMKD.FEAT_WEIGHT = 1.0
+CFG.SIMKD.RESOLUTIONS = [16, 20, 24, 28, 32]
+
 
 # DOT CFG
 CFG.SOLVER.DOT = CN()

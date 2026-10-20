@@ -124,3 +124,10 @@ wandb/
 
 # download ckpts
 download_ckpts/
+
+# TGSC generated data and local correctness-check artifacts
+tgsc_cache/
+tgsc_runs/
+.test-artifacts/
+*.pt
+*.tmp

@@ -1,0 +1,89 @@
+{
+  "teacher_model": "resnet32x4",
+  "teacher_checkpoint": null,
+  "student_model": "resnet8x4",
+  "student_checkpoint": null,
+  "num_classes": 100,
+  "data": {
+    "root": "./data",
+    "batch_size": 128,
+    "num_workers": 0,
+    "pin_memory": true,
+    "stages": [
+      [
+        16,
+        48
+      ],
+      [
+        20,
+        48
+      ],
+      [
+        24,
+        48
+      ],
+      [
+        28,
+        48
+      ],
+      [
+        32,
+        48
+      ]
+    ]
+  },
+  "kd": {
+    "T": 4.0,
+    "alpha": 0.9
+  },
+  "optim": {
+    "base_lr": 0.05,
+    "momentum": 0.9,
+    "weight_decay": 0.0005,
+    "lr_half_on_stage_change": false,
+    "milestones": [
+      48,
+      144,
+      192
+    ],
+    "milestone_gamma": 0.1
+  },
+  "train": {
+    "epochs": 240,
+    "seed": 27,
+    "save_path": "tgsc_runs/reviewkd_resnet32x4_to_resnet8x4/model.pth",
+    "log_every": 0,
+    "log_dir": "logs",
+    "run_name": "resnet32x4_to_resnet8x4_tgsc_kd"
+  },
+  "tgsc": {
+    "precompute_batch_size": 256,
+    "precompute_workers": 2,
+    "use_gt_target": true,
+    "w_cam": 0.7,
+    "w_sal": 0.3,
+    "temp": 1.5,
+    "gamma": 1.2,
+    "pct_lo": 1.0,
+    "pct_hi": 99.0,
+    "stride": 8,
+    "k_per_img": 6,
+    "min_frac": 0.2,
+    "min_mean": 0.2,
+    "eval_chunk": 256,
+    "cache": true,
+    "cache_to_disk": true,
+    "cache_dir": "tgsc_cache",
+    "flip_prob": 0.5,
+    "aug_padding": 2,
+    "top_k_crops": 2,
+    "low_k_crops": 1,
+    "score_high": 0.75,
+    "score_low": 0.35
+  },
+  "method": "REVIEWKD",
+  "method_options": {
+    "review_weight": 5
+  },
+  "profile_source": "supplied TGSC/configs/resnet32x4_to_resnet8x4.json"
+}

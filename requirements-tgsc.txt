@@ -1,0 +1,4 @@
+# Keep a mutually compatible torch/torchvision pair from the GPU platform.
+numpy
+tqdm
+# Legacy tools/train.py additionally uses requirements.txt's auxiliary packages.

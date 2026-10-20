@@ -110,8 +110,7 @@ class MobileNetV2(nn.Module):
             nn.Linear(self.last_channel, feature_dim),
         )
 
-        H = input_size // (32 // 2)
-        self.avgpool = nn.AvgPool2d(H, ceil_mode=True)
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
 
         self._initialize_weights()
         print(T, width_mult)
@@ -150,6 +149,7 @@ class MobileNetV2(nn.Module):
         f4 = out
         out = self.conv2(out)
 
+        final_feat = out
         if not self.remove_avg:
             out = self.avgpool(out)
         out = out.reshape(out.size(0), -1)
@@ -158,6 +158,7 @@ class MobileNetV2(nn.Module):
 
         feats = {}
         feats["feats"] = [f0, f1, f2, f3, f4]
+        feats["final_feat"] = final_feat
         feats["pooled_feat"] = avg
 
         return out, feats

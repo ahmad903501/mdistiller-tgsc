@@ -1,5 +1,9 @@
 <div align=center><img src=".github/mdistiller.png" width="40%" ><div align=left>
 
+## TGSC integration
+
+DKD, SimKD, and ReviewKD can run through the shared [TGSC Python runner](tools/run_tgsc.py) and [Kaggle notebooks](notebooks/). Start with the [running guide](docs/TGSC_RUNNING.md) for cache preparation, GPU selection, training, resume, and evaluation. FitNet is deferred. See the [progress report](docs/TGSC_IMPLEMENTATION_PROGRESS.md) for verification status; real GPU/Kaggle acceptance is pending.
+
 This repo is
 
 (1) a PyTorch library that provides classical knowledge distillation algorithms on mainstream CV benchmarks,

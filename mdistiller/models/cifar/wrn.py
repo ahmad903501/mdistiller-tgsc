@@ -133,7 +133,8 @@ class WideResNet(nn.Module):
         out = self.block3(out)
         f3 = out
         out = self.relu(self.bn1(out))
-        out = F.avg_pool2d(out, 8)
+        final_feat = out
+        out = F.adaptive_avg_pool2d(out, (1, 1))
         out = out.reshape(-1, self.nChannels)
         f4 = out
         out = self.fc(out)
@@ -146,6 +147,7 @@ class WideResNet(nn.Module):
         feats["feats"] = [f0, f1, f2, f3]
         feats["preact_feats"] = [f0, f1_pre, f2_pre, f3_pre]
         feats["pooled_feat"] = f4
+        feats["final_feat"] = final_feat
 
         return out, feats
 

@@ -1,0 +1,14 @@
+{
+  "simkd_projector": "pass: outputs and input gradients",
+  "review_abf_hcl": "pass: outputs/loss/gradients",
+  "oracle": "pass: CAM and selected crop/q parity at 16,20,32 on three model families",
+  "pooling_32_max_abs": {
+    "resnet8": 7.450580596923828e-08,
+    "wrn_16_2": 2.384185791015625e-07,
+    "MobileNetV2": 0.0,
+    "ShuffleV2": 0.0,
+    "ShuffleV1": 0.013520494103431702
+  },
+  "device": "cpu",
+  "torch": "2.6.0+cpu"
+}

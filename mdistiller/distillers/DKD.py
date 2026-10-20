@@ -3,6 +3,22 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ._base import Distiller
+from ..tgsc.gates import weighted_mean
+
+
+def dkd_components(logits_student, logits_teacher, target, temperature):
+    """Official KL components before batch reduction, for sample-wise gating."""
+    gt_mask = _get_gt_mask(logits_student, target)
+    other_mask = ~gt_mask
+    ps = cat_mask(F.softmax(logits_student / temperature, dim=1), gt_mask, other_mask)
+    pt = cat_mask(F.softmax(logits_teacher / temperature, dim=1), gt_mask, other_mask)
+    tckd = F.kl_div(ps.log(), pt, reduction="none").sum(1) * temperature**2
+    nckd = F.kl_div(
+        F.log_softmax(logits_student / temperature - 1000.0 * gt_mask, dim=1),
+        F.softmax(logits_teacher / temperature - 1000.0 * gt_mask, dim=1),
+        reduction="none",
+    ).sum(1) * temperature**2
+    return tckd, nckd
 
 
 def dkd_loss(logits_student, logits_teacher, target, alpha, beta, temperature):
@@ -69,7 +85,23 @@ class DKD(Distiller):
 
         # losses
         loss_ce = self.ce_loss_weight * F.cross_entropy(logits_student, target)
-        loss_dkd = min(kwargs["epoch"] / self.warmup, 1.0) * dkd_loss(
+        metadata = kwargs.get("tgsc")
+        if metadata is not None:
+            tckd, nckd = dkd_components(logits_student, logits_teacher, target, self.temperature)
+            self.tgsc_diagnostics = {"raw_tckd": tckd.detach().mean(), "raw_nckd": nckd.detach().mean()}
+            threshold = kwargs.get("gate_threshold", 0.75)
+            mode = kwargs.get("gate_mode", "unified")
+            if mode == "decoupled":
+                gates = dict(metadata, target_quality=(metadata["r1"] + metadata["r3"]) / 2)
+                loss_dkd = self.alpha * weighted_mean(tckd, gates, threshold, "target_quality")
+                loss_dkd += self.beta * weighted_mean(nckd, gates, threshold, "r2")
+            elif mode == "unified":
+                loss_dkd = weighted_mean(self.alpha * tckd + self.beta * nckd, metadata, threshold)
+            else:
+                raise ValueError("DKD gate mode must be unified or decoupled")
+            loss_dkd *= min(kwargs["epoch"] / self.warmup, 1.0) if self.warmup else 1.0
+            return logits_student, {"loss_ce": loss_ce, "loss_kd": loss_dkd}
+        loss_dkd = (min(kwargs["epoch"] / self.warmup, 1.0) if self.warmup else 1.0) * dkd_loss(
             logits_student,
             logits_teacher,
             target,

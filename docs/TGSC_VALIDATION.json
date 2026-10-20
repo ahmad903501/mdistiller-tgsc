@@ -1,0 +1,17 @@
+{
+  "self_contained_tests": 11,
+  "result": "pass",
+  "notebooks_parsed": [
+    "tgsc_dkd_cifar100.ipynb",
+    "tgsc_prepare_cifar100.ipynb",
+    "tgsc_reviewkd_cifar100.ipynb",
+    "tgsc_simkd_cifar100.ipynb"
+  ],
+  "isolated_import": "pass",
+  "isolated_tests": "pass",
+  "cli_invalid_gpu": "pass",
+  "cli_cpu_check_reaches_input_validation": "pass",
+  "python": "3.13.1",
+  "cuda_verified": false,
+  "kaggle_executed": false
+}

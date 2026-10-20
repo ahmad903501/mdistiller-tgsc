@@ -173,7 +173,8 @@ class ShuffleNetV2(nn.Module):
         out, f3_pre = self.layer3(out)
         f3 = out
         out = F.relu(self.bn2(self.conv2(out)))
-        out = F.avg_pool2d(out, 4)
+        final_feat = out
+        out = F.adaptive_avg_pool2d(out, (1, 1))
         out = out.reshape(out.size(0), -1)
         avg = out
         f4 = out
@@ -182,6 +183,7 @@ class ShuffleNetV2(nn.Module):
         feats = {}
         feats["feats"] = [f0, f1, f2, f3]
         feats["preact_feats"] = [f0, f1_pre, f2_pre, f3_pre]
+        feats["final_feat"] = final_feat
         feats["pooled_feat"] = f4
 
         return out, feats
