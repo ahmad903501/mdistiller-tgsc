@@ -20,13 +20,30 @@ The TGSC runner uses JSON profiles and does not require YACS, TensorBoard, or W&
 
 Provide CIFAR-100 in torchvision format: the data root contains the extracted `cifar-100-python/` directory. `--download` explicitly enables torchvision downloading into the selected data root; use a writable root for downloads. Teacher checkpoints accept `model`, `state_dict`, or a direct state dict and load strictly. Use trusted teacher artifacts compatible with the selected architecture; the runner never assumes personal checkpoint paths.
 
-The preparation notebook can download the official teacher archive automatically: leave `DOWNLOAD_TEACHER=True`. It selects the teacher from `CONFIG_NAME`, inspects the actual archive member and model registry, extracts only that teacher, checks the checkpoint SHA-256 against the archive, then performs a strict state-dict load and finite 100-class CPU forward. Set the flag false to use attached weights instead. No `gdown` dependency or nonexistent `download_ckpts.sh` is used.
+All four notebooks support two teacher sources through `TEACHER_SOURCE`:
+
+- `"download"`: download the official combined teacher archive (about 348 MiB), extract only the teacher selected by `CONFIG_NAME`, compare its SHA-256 against the archive, then verify strict loading and a finite 100-class CPU forward. The official release does not expose individual teacher assets. Existing archives are reused.
+- `"kaggle"`: use the attached single-model checkpoint at `TEACHER_CHECKPOINT`. Preflight loads it strictly into the configured architecture; cache identity also uses the checkpoint hash.
+
+The preparation notebook defaults to downloading; method notebooks default to attached artifacts. No `gdown` dependency or nonexistent `download_ckpts.sh` is used.
+
+For CIFAR-100, `CIFAR_SOURCE="download"` uses `torchvision.datasets.CIFAR100`, matching TGSC, with a writable `DATA_ROOT` (default `/kaggle/working/data` in preparation). `CIFAR_SOURCE="kaggle"` reads an attached Dataset with `download=False`; set `DATA_ROOT` to the parent of `cifar-100-python/`. CSV/PNG-only Kaggle copies need conversion and are not accepted directly. The same original files/order/labels must be used for preparation and training. See [torchvision CIFAR100](https://docs.pytorch.org/vision/stable/generated/torchvision.datasets.CIFAR100.html).
 
 Equivalent local command:
 
 ```bash
 python tools/download_teachers.py --config configs/tgsc/cifar100/dkd_resnet32x4_to_resnet8x4.json --output-dir download_ckpts
 ```
+
+To prepare a small upload folder locally from an already downloaded archive:
+
+```bash
+python tools/download_teachers.py --teacher resnet32x4 --archive download_ckpts/cifar_teachers.tar --output-dir download_ckpts/kaggle/resnet32x4
+```
+
+Upload **the contents of `download_ckpts/kaggle/resnet32x4/`** as a Kaggle Dataset (e.g. `tgsc-teacher-resnet32x4`). It contains only the selected checkpoint under `cifar_teachers/resnet32x4_vanilla/` and `teacher_manifest.json`, which records its portable relative path, teacher name, official source and SHA-256. Do not include the 348 MiB archive. For this layout set `TEACHER_SOURCE="kaggle"` and `TEACHER_CHECKPOINT=/kaggle/input/tgsc-teacher-resnet32x4/cifar_teachers/resnet32x4_vanilla/ckpt_epoch_240.pth`; adjust to the actual mounted path. Change `--teacher` for another model. No weights are committed to Git, and no Dataset upload is automatic.
+
+For CIFAR, preserve `DATA_ROOT/cifar-100-python/` as a separate Dataset after the first download; attach it in later sessions with `CIFAR_SOURCE="kaggle"`. Keep the crop bank in its own reusable Dataset.
 
 The verified archive directory convention is `cifar_teachers/<teacher>_vanilla/ckpt_epoch_240.pth`. Case matters (`ResNet50`, versus `resnet32x4`). Actual archive entries and strict-load results are recorded in `TGSC_TEACHER_ARCHIVE_CHECKS.json`. The legacy official checkpoints include NumPy scalar metadata; the loader allows only the required scalar/dtype constructors while retaining `weights_only=True`. This compatibility fix requires updated code, so previously pinned revisions should be advanced before first real-checkpoint runs.
 
@@ -132,7 +149,7 @@ Run each selected config's preflight before this concurrent launch. The two jobs
 ### Preparation, dataset upload, and first training run
 
 1. Import `tgsc_prepare_cifar100.ipynb` into Kaggle. Choose an available T4 x2 accelerator and turn Internet on for the clone/install. Add the GitHub Secret if the repository is private.
-2. Attach CIFAR-100 in torchvision layout and the matching teacher checkpoint. Set their actual paths in the settings cell. Alternatively download CIFAR explicitly with `DOWNLOAD=True` and a writable data root, then preserve it for later sessions.
+2. For the first preparation, leave `TEACHER_SOURCE="download"` and `CIFAR_SOURCE="download"` with writable roots. Alternatively set either source to `"kaggle"` and provide its attached path. Preserve the selected weights and original CIFAR files as reusable Datasets, in addition to the crop bank.
 3. Use one teacher/profile first: ResNet32x4 -> ResNet8x4. Set `GPU=0`, the repository revision, and `CACHE_WRITE_ROOT=/kaggle/working/tgsc_cache`. Run preparation. The DKD-named config selects the teacher's TGSC profile; the resulting bank is not DKD-specific.
 4. Preserve the completed `tgsc_cache/` output, then create a Kaggle Dataset containing that directory (or attach the saved notebook output directly). Keep the bank hash directory and filenames unchanged.
 5. Import the DKD method notebook and attach **all three** inputs: original CIFAR-100, teacher weights, and the prepared cache. Original training data is still used to validate dataset identity; test data supplies evaluation. Cached oracle values do not replace online teacher features/logits.

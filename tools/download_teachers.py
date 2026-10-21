@@ -93,9 +93,14 @@ def main():
         if digest != official_digest:
             raise ValueError(f"Existing checkpoint differs from the official archive: {destination}; use another output directory")
         verify_checkpoint(teacher, destination)
-        print(json.dumps({"teacher": teacher, "source": URL, "archive_member": member.name,
+        report = {"teacher": teacher, "source": URL, "archive_member": member.name,
                           "checkpoint": str(destination), "sha256": digest,
-                          "verification": "strict state_dict load and finite 100-class forward passed"}, indent=2))
+                          "relative_checkpoint": destination.relative_to(Path(args.output_dir).resolve()).as_posix(),
+                          "verification": "strict state_dict load and finite 100-class forward passed"}
+        # The relative path and hash remain useful after uploading this folder to Kaggle.
+        manifest = Path(args.output_dir) / "teacher_manifest.json"
+        manifest.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps(report, indent=2))
 
 
 if __name__ == "__main__":
