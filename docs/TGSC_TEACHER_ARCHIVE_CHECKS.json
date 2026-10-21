@@ -1,0 +1,87 @@
+{
+  "source": "https://github.com/megvii-research/mdistiller/releases/download/checkpoints/cifar_teachers.tar",
+  "archive_bytes": 364390400,
+  "members": [
+    {
+      "name": "cifar_teachers/resnet110_vanilla/ckpt_epoch_240.pth",
+      "bytes": 14067163
+    },
+    {
+      "name": "cifar_teachers/ResNet50_vanilla/ckpt_epoch_240.pth",
+      "bytes": 189921718
+    },
+    {
+      "name": "cifar_teachers/resnet32x4_vanilla/ckpt_epoch_240.pth",
+      "bytes": 59554438
+    },
+    {
+      "name": "cifar_teachers/resnet56_vanilla/ckpt_epoch_240.pth",
+      "bytes": 6981725
+    },
+    {
+      "name": "cifar_teachers/vgg13_vanilla/ckpt_epoch_240.pth",
+      "bytes": 75736886
+    },
+    {
+      "name": "cifar_teachers/wrn_40_2_vanilla/ckpt_epoch_240.pth",
+      "bytes": 18113193
+    }
+  ],
+  "state_dict_checks": [
+    {
+      "teacher": "resnet32x4",
+      "source": "https://github.com/megvii-research/mdistiller/releases/download/checkpoints/cifar_teachers.tar",
+      "archive_member": "cifar_teachers/resnet32x4_vanilla/ckpt_epoch_240.pth",
+      "checkpoint": "download_ckpts/cifar_teachers/resnet32x4_vanilla/ckpt_epoch_240.pth",
+      "sha256": "22aa12e2b632b19ddde155ccf2388671842ddd304824b3095e0a7fff364beb4f",
+      "verification": "strict state_dict load and finite 100-class forward passed"
+    },
+    {
+      "teacher": "wrn_40_2",
+      "source": "https://github.com/megvii-research/mdistiller/releases/download/checkpoints/cifar_teachers.tar",
+      "archive_member": "cifar_teachers/wrn_40_2_vanilla/ckpt_epoch_240.pth",
+      "checkpoint": "download_ckpts/cifar_teachers/wrn_40_2_vanilla/ckpt_epoch_240.pth",
+      "sha256": "41100a8e8478b326645eb9aab09c18fc8ed34c1ab4004d658cb652125a81ca18",
+      "verification": "strict state_dict load and finite 100-class forward passed"
+    },
+    {
+      "teacher": "vgg13",
+      "source": "https://github.com/megvii-research/mdistiller/releases/download/checkpoints/cifar_teachers.tar",
+      "archive_member": "cifar_teachers/vgg13_vanilla/ckpt_epoch_240.pth",
+      "checkpoint": "download_ckpts/cifar_teachers/vgg13_vanilla/ckpt_epoch_240.pth",
+      "sha256": "ff25893af9e28fe12cfcc4fd0c699596754eb89bfafd521dfb1301cd281b47f8",
+      "verification": "strict state_dict load and finite 100-class forward passed"
+    },
+    {
+      "teacher": "resnet56",
+      "source": "https://github.com/megvii-research/mdistiller/releases/download/checkpoints/cifar_teachers.tar",
+      "archive_member": "cifar_teachers/resnet56_vanilla/ckpt_epoch_240.pth",
+      "checkpoint": "download_ckpts/cifar_teachers/resnet56_vanilla/ckpt_epoch_240.pth",
+      "sha256": "4143895c82105da0a73236230db11aee5be39b660fe21e1323037c774f994155",
+      "verification": "strict state_dict load and finite 100-class forward passed"
+    },
+    {
+      "teacher": "resnet110",
+      "source": "https://github.com/megvii-research/mdistiller/releases/download/checkpoints/cifar_teachers.tar",
+      "archive_member": "cifar_teachers/resnet110_vanilla/ckpt_epoch_240.pth",
+      "checkpoint": "download_ckpts/cifar_teachers/resnet110_vanilla/ckpt_epoch_240.pth",
+      "sha256": "75dc04faf468c078f1dfa010b51069fa3a8a4b91145379574e05c8e63e7441a9",
+      "verification": "strict state_dict load and finite 100-class forward passed"
+    },
+    {
+      "teacher": "ResNet50",
+      "source": "https://github.com/megvii-research/mdistiller/releases/download/checkpoints/cifar_teachers.tar",
+      "archive_member": "cifar_teachers/ResNet50_vanilla/ckpt_epoch_240.pth",
+      "checkpoint": "download_ckpts/cifar_teachers/ResNet50_vanilla/ckpt_epoch_240.pth",
+      "sha256": "9f546083e2e4e5aaa733b328f34c354acb93b168952684f7742f556ba1253c3d",
+      "verification": "strict state_dict load and finite 100-class forward passed"
+    }
+  ],
+  "archive_sha256": "e7c8b2f7d449af08e1222663e845ad23ca4a2044735b980740d86a96088de52c",
+  "environment": {
+    "python": "3.13.1",
+    "torch": "2.6.0+cpu",
+    "numpy": "2.2.3",
+    "device": "cpu"
+  }
+}

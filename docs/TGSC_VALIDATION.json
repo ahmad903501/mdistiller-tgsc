@@ -1,5 +1,5 @@
 {
-  "self_contained_tests": 11,
+  "self_contained_tests": 13,
   "result": "pass",
   "notebooks_parsed": [
     "tgsc_dkd_cifar100.ipynb",

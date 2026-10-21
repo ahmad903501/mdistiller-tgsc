@@ -28,7 +28,16 @@ def build_model(name, num_classes=100):
 
 
 def load_teacher(model, path):
-    payload = torch.load(path, map_location="cpu", weights_only=True)
+    # Official legacy archives include NumPy scalar accuracy metadata alongside weights.
+    # Allow only those scalar/dtype constructors; retain the restricted weights unpickler.
+    try:
+        from numpy._core.multiarray import scalar
+    except ImportError:  # NumPy 1.x uses the older module path.
+        from numpy.core.multiarray import scalar
+    allowed = [(scalar, "numpy.core.multiarray.scalar"), scalar, np.dtype,
+               type(np.dtype("float64")), type(np.dtype("float32"))]
+    with torch.serialization.safe_globals(allowed):
+        payload = torch.load(path, map_location="cpu", weights_only=True)
     state = payload.get("model", payload.get("state_dict", payload))
     state = {k.removeprefix("module.").removeprefix("model."): v for k, v in state.items()}
     model.load_state_dict(state, strict=True)

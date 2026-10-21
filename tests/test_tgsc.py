@@ -8,6 +8,8 @@ import unittest
 from contextlib import contextmanager
 import shutil
 import uuid
+import io
+import tarfile
 from types import SimpleNamespace
 
 import numpy as np
@@ -23,7 +25,7 @@ from mdistiller.tgsc.experiment import load_run
 from mdistiller.tgsc.cache import CropBank, manifest, prepare_bank
 from mdistiller.tgsc.gates import quality_gate, weighted_mean
 from mdistiller.tgsc.runtime import (build_model, build_distiller, export_payload, load_export,
-                                    MergeSingletonBatches, train, seed_everything, resume_contract)
+                                    MergeSingletonBatches, train, seed_everything, resume_contract, load_teacher)
 
 torch.set_num_threads(2)
 
@@ -56,6 +58,29 @@ class MiniCifar(Dataset):
 
 
 class TGSCContracts(unittest.TestCase):
+    def test_legacy_teacher_numpy_metadata_loads_strictly(self):
+        model = build_model("resnet8")
+        with test_directory() as directory:
+            checkpoint = Path(directory) / "legacy.pth"
+            torch.save({"model": model.state_dict(), "best_acc": np.float64(72.3)}, checkpoint)
+            restored = load_teacher(build_model("resnet8"), checkpoint)
+            for key, value in model.state_dict().items():
+                torch.testing.assert_close(value, restored.state_dict()[key])
+
+    def test_teacher_archive_member_selection_preserves_case(self):
+        from tools.download_teachers import select_member
+        memory = io.BytesIO()
+        with tarfile.open(fileobj=memory, mode="w") as archive:
+            info = tarfile.TarInfo("cifar_teachers/ResNet50_vanilla/ckpt_epoch_240.pth")
+            info.size = 1
+            archive.addfile(info, io.BytesIO(b"x"))
+        memory.seek(0)
+        with tarfile.open(fileobj=memory, mode="r") as archive:
+            self.assertEqual(select_member(archive,"ResNet50").name,
+                             "cifar_teachers/ResNet50_vanilla/ckpt_epoch_240.pth")
+            with self.assertRaises(ValueError):
+                select_member(archive,"resnet50")
+
     def test_gates_weight_each_sample_and_detach(self):
         quality = torch.tensor([0., .375, .75, 3.], requires_grad=True)
         losses = torch.tensor([4., 8., 12., 16.], requires_grad=True)

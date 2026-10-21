@@ -20,6 +20,16 @@ The TGSC runner uses JSON profiles and does not require YACS, TensorBoard, or W&
 
 Provide CIFAR-100 in torchvision format: the data root contains the extracted `cifar-100-python/` directory. `--download` explicitly enables torchvision downloading into the selected data root; use a writable root for downloads. Teacher checkpoints accept `model`, `state_dict`, or a direct state dict and load strictly. Use trusted teacher artifacts compatible with the selected architecture; the runner never assumes personal checkpoint paths.
 
+The preparation notebook can download the official teacher archive automatically: leave `DOWNLOAD_TEACHER=True`. It selects the teacher from `CONFIG_NAME`, inspects the actual archive member and model registry, extracts only that teacher, checks the checkpoint SHA-256 against the archive, then performs a strict state-dict load and finite 100-class CPU forward. Set the flag false to use attached weights instead. No `gdown` dependency or nonexistent `download_ckpts.sh` is used.
+
+Equivalent local command:
+
+```bash
+python tools/download_teachers.py --config configs/tgsc/cifar100/dkd_resnet32x4_to_resnet8x4.json --output-dir download_ckpts
+```
+
+The verified archive directory convention is `cifar_teachers/<teacher>_vanilla/ckpt_epoch_240.pth`. Case matters (`ResNet50`, versus `resnet32x4`). Actual archive entries and strict-load results are recorded in `TGSC_TEACHER_ARCHIVE_CHECKS.json`. The legacy official checkpoints include NumPy scalar metadata; the loader allows only the required scalar/dtype constructors while retaining `weights_only=True`. This compatibility fix requires updated code, so previously pinned revisions should be advanced before first real-checkpoint runs.
+
 Profiles are in `configs/tgsc/cifar100/`:
 
 - DKD and SimKD: existing TGSC ResNet32x4 -> ResNet8x4, WRN40-2 -> WRN40-1, VGG13 -> VGG8 profiles.
